@@ -18,7 +18,8 @@
 #*****************************************************************
 
 #### Load Packages ####
-
+# [ABP comment]Can you go through and take out the packages you don't use in this script like gganimate?
+# I think the only ones should be lubridate and tidyverse. Yep, I did it with only the first two packages installed
 library(lubridate)
 library(tidyverse)
 library(magrittr)
@@ -31,8 +32,10 @@ library(readxl)
 #set working directory
 setwd('C:/Users/hammo/Documents/Magic Sensor PLSR/ManualDownloadsSCCData/MagicData')
 
-
+# [ABP comment] just setting my own working directory path
+setwd("./MagicData")
 #### Load in FP files from GitHub for the MUX ####
+# [ABP comment]I might explain what this is or take it out
 # Valve  # Depth
 #   1       0.1
 #   2       1.6
@@ -91,6 +94,7 @@ Valves = Valves %>%
 mux_only = cbind(mux_only,Valves)
 
 # Plot a single wavelength
+# [ABP comment]What is it that you want this plot to show?
 plot(obs2$DateTime,obs2$`255`)
 
 
@@ -99,15 +103,18 @@ mux_only_long=mux_only%>%
   pivot_longer(cols=3:223, names_to = "wavelength", values_to = "absorbance")
 
 # Plot data
+# [ABP comment] What do you want this plot to show?
 ggplot(data = filter(mux_only_long, wavelength %in% c(seq(200,700,10)))) +
   geom_point(aes(x = DateTime, y = absorbance, color = as.numeric(wavelength))) +
   facet_wrap(~Depth, nrow = 4, scales = "free_y")
 
 
 # Plot wavelength vs. absorption over time for a single depth 
+# [ABP Comment] Again maybe a little description on what you are looking for. Visual outliers? 
+# I also added as.numeric in front of wavelength so it can be graphed easier. 
 ggplot() +
   geom_point(data = filter(mux_only_long, Depth == "9" & DateTime > as.POSIXct("2021-06-10 12:00")), 
-             aes(x=wavelength,y=absorbance, colour = DateTime)) 
+             aes(x=as.numeric(wavelength),y=absorbance, colour = DateTime)) 
 
 
 
@@ -118,6 +125,9 @@ MUX = mux_only
 
 # Specify directory and file name for data file
 pathWQ = "C:/Users/hammo/Documents/Magic Sensor PLSR/Data/"
+
+# [ABP comment]just setting my own file path here
+pathWQ = "./MagicData/"
 WQ = "Metals_2014_2021.csv"
 #Download EDI metals dataset
 inUrl1  <- "https://pasta.lternet.edu/package/data/eml/edi/455/6/57912981e3e857c85924484806492446" 
@@ -141,6 +151,7 @@ dataWQ = dataWQ %>% filter(Reservoir == "FCR" & Site == 50) %>%
 #### Match WQ times with MUX times to find the reading closest to the sampling time ####
 
 WQtimes <- dataWQ %>% select(DateTime,Depth_m)
+# [ABP comment] these two steps are redundant because they are already in the correct format
 WQtimes$Depth_m <- as.character(WQtimes$Depth_m)
 WQtimes$DateTime <- ymd_hms(WQtimes$DateTime, tz="America/New_York")
 
@@ -151,7 +162,7 @@ WQtimes <- WQtimes %>% mutate(date = date(DateTime))
 # Remove samples from 06-02-2021 because the MUX was not deployed during that time
 WQtimes <- WQtimes %>% filter(date(DateTime) != "2021-06-02")
 
-
+# Find the FP reading that is closest in time to each WQ data point (at each depth)
 df.final<-MUX %>% filter(Depth == WQtimes$Depth_m[1]) %>% 
   mutate(time_diff = as.numeric(DateTime) - as.numeric(WQtimes$DateTime[1]))  %>% 
   slice_min(abs(time_diff))

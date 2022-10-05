@@ -51,6 +51,7 @@
 
 #### Set up your packages, data location, and working directory. Load functions. ####
 
+# [ABP comment] Again just add the packages you need
 #packages needed
 library(lubridate)
 library(tidyverse)
@@ -65,21 +66,24 @@ library(scales)
 library(ggpubr)
 library(enpls)
 
-# Set Working Directory
-setwd("C:/Users/hammo/Documents/Magic Sensor PLSR/")
 
 #load functions
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_function.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_function_boot.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_data_prep_function_2021.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_num_components_function.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_function_enpls.R')
+# load functions from GitHub and then set working directory
+# [ABP comment] ./ part means “looking within the shared repository”
+source('./Scripts/Current Magic Scripts/PLSR_function.R')
+source('./Scripts/Current Magic Scripts/PLSR_function_boot.R')
+source('./Scripts/Current Magic Scripts/PLSR_data_prep_function_2021.R')
+source('./Scripts/Current Magic Scripts/PLSR_num_components_function.R')
+source('./Scripts/Current Magic Scripts/PLSR_function_enpls.R')
 
+# Set Working Directory
+setwd("C:/Users/hammo/Documents/Magic Sensor PLSR/")
 
 #### Specify input files, depths, date ranges, and parameters. Prep data. ####
 
 #Specify files for WQ data, FP overlaps, and the entire FP time series
 pathD<-"C:/Users/hammo/Documents/Magic Sensor PLSR/Data/" # Specify folder where EDI data will be downloaded
+pathD<-"./MagicData/"
 WQ_name<-"Metals_2014_2021.csv" # Specify name of WQ file
 FPcaldata_name<-"MUX_FP_Overlaps_2021.csv" # Name of FP 'overlaps' file (for calibration)
 TimeSeriesFP_name<-"MUX_FP_TS_2021.csv" # Name of FP time series file (for prediction)
@@ -117,11 +121,14 @@ param = "TFe_mgL"
 
 
 ##### Identify Outliers #####
+# [ABP comment] Again a little more explanation right here on the range of maxcomp and reps
 maxcomp = 5 # set the maximum number of components for the enpls fit function (which automatically determines components)
 reps = 50 # set the number of Monte Carlo repetitions 
 
 # Run enpls function and look at outlier plot to identify values that 
 # should potentially be deleted
+# [ABP comment] What are the colored and numbered dots on the graph for? Can you 
+# explain where an outlier would fall?
 
 PLSR_enpls(param,dataCalFP,dataWQ,maxcomp=maxcomp,reptimes=reps)
 
@@ -136,6 +143,7 @@ dataWQ[c(12,15),param] = NA_real_
 ncomp=15 # max number of components to try
 PLSR_SCAN(param,dataCalFP,dataWQ,TS_FP,ncomp, yesplot=TRUE)
 
+# [ABP comment]What are you looking for in this plot?
 #png("RMSEP21_TFe_epi_4comp_1out_051322.png",width = 9, height = 4, units = 'in', res = 300)
 plot(RMSEP(fit), legendpos = "topright",main = param)
 #dev.off()
@@ -161,6 +169,7 @@ abline(a=0,b=1)
 #dev.off()
 
 # loading plot
+# [ABP comment]Your legend blocks the whole plot
 #png("Loading21_TFe_epi_4comp_1out_051322.png",width = 9, height = 5, units = 'in', res = 300)
 plot(fit, "loading", comps = 1:ncomp, legendpos = "topright")
 abline(h = 0)
@@ -252,7 +261,7 @@ write.csv(WQ_all,"MUX21_dataWQ_051322.csv")
 
 
 
-
+# [ABP comment]Again comment out old code or put it somewhere else
 
 
 #### Old Code ####

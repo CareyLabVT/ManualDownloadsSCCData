@@ -64,26 +64,33 @@ library(scales)
 library(ggpubr)
 library(enpls)
 
-# Set working directory
+
+# load functions from GitHub and then set working directory
+# [ABP comment] ./ part means “looking within the shared repository”
+source('./Scripts/Current Magic Scripts/PLSR_function.R')
+source('./Scripts/Current Magic Scripts/PLSR_function_boot.R')
+source('./Scripts/Current Magic Scripts/PLSR_data_prep_function.R')
+source('./Scripts/Current Magic Scripts/PLSR_num_components_function.R')
+source('./Scripts/Current Magic Scripts/PLSR_function_enpls.R')
+
+
+# Set working directory 
+# [ABP comment] Can you work within the Github Repo? This is not reproducible
 setwd("C:/Users/hammo/Documents/Magic Sensor PLSR/")
 
-#load functions
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_function.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_function_boot.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_data_prep_function.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_num_components_function.R')
-source('ManualDownloadsSCCData/Scripts/Current Magic Scripts/PLSR_function_enpls.R')
 
+setwd('./MagicData')
 
 #### Specify input files, depths, date ranges, and parameters. Prep data. ####
 
 #Specify files for WQ data, FP overlaps, and the entire FP time series
-pathD<-"C:/Users/hammo/Documents/Magic Sensor PLSR/Data/" # Specify folder where EDI data will be downloaded
+pathD<-"./MagicData/" # Specify folder where EDI data will be downloaded
 WQ_name<-"Metals_2014_2021.csv" # Specify name of WQ file
 FPcaldata_name<-"MUX_FP_Overlaps_2020.csv" # Name of FP 'overlaps' file (for calibration)
 TimeSeriesFP_name<-"MUX_FP_TS_2020.csv" # Name of FP time series file (for prediction)
 
 #Select Desired Depths
+# [ABP Comment] Can you put a little more explanation here about which depths to use?
 Depths<-c("0.1",
   "1.6",
   "3.8"
@@ -112,14 +119,17 @@ TS_FP = TS_FP[,-c(1:20)]
 
 
 # Variable indicating parameter to be modeled
+# [ABP comment]Can you add a little more explaination here with the other parameters?
 param = "TFe_mgL" 
 
 # Identify Outliers #
+# [ABP comment] Can you put more of an explanation here with the ranges 
 maxcomp = 5 # set the maximum number of components for the enpls fit function (which automatically determines components)
 reps = 50 # set the number of Monte Carlo repetitions 
 
 # Run enpls function and look at outlier plot to identify values that 
 # should potentially be deleted
+# [ABP comment] Can you put more explanation here about what to look for in the plot?
 
 PLSR_enpls(param,dataCalFP,dataWQ,maxcomp=maxcomp,reptimes=reps)
 
@@ -195,6 +205,8 @@ qqline(fit$residuals[,,ncomp], col = "steelblue", lwd = 2)
 shapiro.test(fit$residuals[,,ncomp]) # if p < 0.05, the residuals are NOT normal
 #dev.off()
 
+# [ABP comment] It might help to number the sections in the script as you have in the intro
+# that way you can tell which number to go back to after this point. 
 
 #### Visualize Results ####
 
@@ -257,7 +269,7 @@ write.csv(WQ_all,"MUX20_dataWQ_050622.csv")
 
 
 
-
+# [ABP comment]Either comment out this old code or take it out
 
 
 #### Old Code ####

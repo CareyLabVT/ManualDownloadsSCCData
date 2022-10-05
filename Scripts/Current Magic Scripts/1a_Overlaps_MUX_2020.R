@@ -19,7 +19,8 @@
 
 
 #### Load Packages ####
-
+# [ABP comment]Can you go through and take out the packages you don't use in this script like gganimate?
+# I think the only ones should be lubridate and tidyverse
 library(lubridate)
 library(tidyverse)
 library(magrittr)
@@ -33,8 +34,11 @@ library(readxl)
 #set working directory
 setwd('C:/Users/hammo/Documents/Magic Sensor PLSR/ManualDownloadsSCCData/MagicData')
 
+# [ABP comment] just setting my own working directory path
+setwd("./MagicData")
 
 #### Load in MUX FP files from GitHub ####
+# [ABP comment]I might explain what this is or take it out
 # Valve  # Depth
 #   1       0.1
 #   2       1.6
@@ -73,7 +77,7 @@ for(i in 1:length(muxfiles)){
 # Just subsetting to data after Oct 1st, since that encompasses the Turnover Deployment
 # Joyful Beginning: "2020-10-15 12:00"
 mux_only=obs2[obs2$DateTime>c("2020-10-01 12:00"),]
-mux_only=mux_only[order(mux_only$DateTime),]
+mux_only=mux_only[order(mux_only$DateTime),] # [ABP Comment] introduces lots of NAS at the end of the data set but not sure it matters
 
 
 # Convert valve # to depth
@@ -95,15 +99,18 @@ mux_only_long=mux_only%>%
   pivot_longer(cols=3:223, names_to = "wavelength", values_to = "absorbance")
 
 # Plot data
+# [ABP comment] what are you trying to show here?
 ggplot(data = filter(mux_only_long, wavelength %in% c(seq(200,700,10)))) +
   geom_point(aes(x = DateTime, y = absorbance, color = as.numeric(wavelength))) +
   facet_wrap(~Depth, nrow = 4)
 
 
 # Plot wavelength vs. absorption over time for a single depth 
+# [ABP Comment] Again maybe a little description on what you are looking for. Visual outliers? 
+# I also added as.numeric in front of wavelength so it can be graphed easier. 
 ggplot() +
   geom_point(data = filter(mux_only_long, Depth == "9" & DateTime > as.POSIXct("2020-10-28 12:00")), 
-             aes(x=wavelength,y=absorbance, colour = DateTime)) 
+             aes(x=as.numeric(wavelength),y=absorbance, colour = DateTime))
 
 
 #### Create new df with final dataset ####
@@ -113,6 +120,10 @@ MUX = mux_only
 
 # Specify directory and file name for data file
 pathWQ = "C:/Users/hammo/Documents/Magic Sensor PLSR/Data/"
+
+# [ABP comment]just setting my own file path here
+pathWQ = "./MagicData"
+
 WQ = "Metals_2014_2021.csv"
 #Download EDI metals dataset
 inUrl1  <- "https://pasta.lternet.edu/package/data/eml/edi/455/6/57912981e3e857c85924484806492446" 
@@ -133,6 +144,7 @@ dataWQ = dataWQ %>% filter(Reservoir == "FCR" & Site == 50) %>%
 
 #### Match WQ times with MUX times to find the reading closest to the sampling time ####
 WQtimes <- dataWQ %>% select(DateTime,Depth_m)
+# [ABP comment] these two steps are redundant because they are already in the correct format
 WQtimes$Depth_m <- as.character(WQtimes$Depth_m)
 WQtimes$DateTime <- ymd_hms(WQtimes$DateTime, tz="America/New_York")
 
@@ -152,6 +164,7 @@ for (i in 2:nrow(WQtimes)){ #loop through all sample times and add the closest v
 MUX_FP_Overlaps_2020 = df.final
 
 #Plot to check
+# [ABP Comment]Can you explicitly state what you are looking for with this plot?
 plot(WQtimes$DateTime[which(WQtimes$Depth_m=="9")],MUX_FP_Overlaps_2020$DateTime[which(MUX_FP_Overlaps_2020$Depth =="9")],
      xlab = "Sampling Times", ylab = "MUX times")
 abline(a=0,b=1)
@@ -159,6 +172,7 @@ abline(a=0,b=1)
 # What's the time difference between the sampling time and MUX FP measurement time?
 plot(MUX_FP_Overlaps_2020$DateTime, MUX_FP_Overlaps_2020$time_diff/3600,
      xlab = "DateTime", ylab = "time difference (hr)")
+# [ABP comment] What is the abline for? Maybe you should get rid of it?
 abline(a=1,b=0)
 
 # What's the max time difference, out of all overlaps pairs?
