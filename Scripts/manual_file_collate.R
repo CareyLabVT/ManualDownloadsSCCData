@@ -10,7 +10,8 @@
 #' @param outfile The name of the L1 compiled file with all observations for the year
 #'
 #' @return no output
-#'
+
+## Updated: 03 Feb. 25 - added an if statement when there are no files for the current year
 
 pacman::p_load(tidyverse, lubridate)
   
@@ -20,9 +21,17 @@ manual_file_collate <- function(raw_files = "../../ManualDownloadsSCCData",
                      just_CCR_EXO = F, 
                      outfile = "../../fileL1"){
   
+  
   # List files based on current year
   
   myfiles = list.files(path=raw_files, pattern=paste0("_",year), full.names=TRUE)
+  
+  ## If there are no files then just end the function. If not then make the file
+  
+  if(length(myfiles) == 0){
+    print(paste0("No downloaded files in ", year))
+    
+  }else{
   
   # Take out manual files
   files <- myfiles[ !grepl("BVR_manual_*", myfiles) ]
@@ -84,6 +93,7 @@ manual_file_collate <- function(raw_files = "../../ManualDownloadsSCCData",
   
   # Write to a csv
   write.csv(all, paste0(outfile, ".csv"), row.names = F)
+  } # end the if statement
   
 }
 
