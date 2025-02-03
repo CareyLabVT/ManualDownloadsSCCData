@@ -29,7 +29,7 @@ manual_file_collate <- function(raw_files = "../../ManualDownloadsSCCData",
   ## If there are no files then just end the function. If not then make the file
   
   if(length(myfiles) == 0){
-    print(paste0("No downloaded files in ", year))
+    print(paste0("No downloaded files in ", year, " for", raw_files))
     
   }else{
   
